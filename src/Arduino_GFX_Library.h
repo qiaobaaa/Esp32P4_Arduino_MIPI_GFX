@@ -9,7 +9,4 @@
 
 #include "config/displays_config.h"
 
-//Arduino_DataBus *create_default_Arduino_DataBus();
-//Arduino_GFX *create_default_Arduino_GFX();
-
 #endif // _ARDUINO_GFX_LIBRARIES_H_
