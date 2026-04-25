@@ -37,6 +37,7 @@ struct DisplayConfig
 
 #define SCREEN_28_1_DSI_NOTOUCH_A 1
 #define SCREEN_8_DSI_TOUCH_A 2
+#define SCREEN_8_DSI_TOUCH_A 3
 #define SCREEN_7_DSI_TOUCH_A 3
 
 
