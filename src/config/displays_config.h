@@ -39,6 +39,7 @@ struct DisplayConfig
 #define SCREEN_8_DSI_TOUCH_A 2
 #define SCREEN_8_DSI_TOUCH_B 3
 #define SCREEN_7_DSI_TOUCH_A 4
+#define SCREEN_2_8_DSI_TOUCH_A 5
 
 
 #ifndef CURRENT_SCREEN
@@ -124,8 +125,8 @@ const DisplayConfig SCREEN_DEFAULT = {
     .vsync_pulse_width = 8,
     .vsync_back_porch = 50,
     .vsync_front_porch = 50,
-    .prefer_speed = 25000000,
-    .lane_bit_rate = 700,
+    .prefer_speed = 10000000, //25
+    .lane_bit_rate = 1000, //700
     .width = 480,
     .height = 640,
     .rotation = 0,
@@ -749,6 +750,125 @@ const DisplayConfig SCREEN_DEFAULT = {
     .i2c_init_seq = i2c_init_seq_default,
     .i2c_init_seq_size = sizeof(i2c_init_seq_default) / (2 * sizeof(uint8_t))};
 
+#elif CURRENT_SCREEN == SCREEN_2_8_DSI_TOUCH_A
+//JD9852
+static const lcd_init_cmd_t vendor_specific_init_default[] = {
+     {0xDF, (uint8_t[]){0x98, 0x51, 0xE9}, 3, 0},
+
+    // ---------------- PAGE0 0xDE 0x00 ----------------
+    {0xDE, (uint8_t[]){0x00}, 1, 0},
+
+    // VGMP,VGSP,VGMN,VGSN 4.5  0xB7 5字节
+    {0xB7, (uint8_t[]){0x13, 0x7E, 0x13, 0x42}, 4, 0},
+
+    // Set_R_GAMMA 0xC8 33个参数
+    {0xC8, (uint8_t[]){
+        0x3F,0x33,0x2D,0x1E,0x1A,0x1A,0x17,0x19,0x1C,0x1D,0x1E,0x1C,0x1C,0x1D,0x1D,0x0E,
+        0x3F,0x33,0x2D,0x1E,0x1A,0x1A,0x18,0x19,0x1B,0x1D,0x1E,0x1B,0x1B,0x1D,0x1C,0x0E
+    }, 32, 0},
+
+    // POW_CTRL 0xB9 3字节
+    {0xB9, (uint8_t[]){0x33, 0x08, 0xCC}, 3, 0},
+
+    // DCDC_SEL 0xBB 9字节
+    {0xBB, (uint8_t[]){0x46, 0x7A, 0xC0, 0x40, 0x7C, 0x60, 0x70, 0x70}, 8, 0},
+
+    // VDDD_CTRL 0xBC 3字节
+    {0xBC, (uint8_t[]){0x38, 0x3C}, 2, 0},
+
+    // SETSTBA 0xC0 2字节
+    {0xC0, (uint8_t[]){0x21, 0x20}, 2, 0},
+
+    // SETPANEL(default) 0xC1 带1ms延时
+    {0xC1, (uint8_t[]){0x16}, 1, 1},
+
+    // SETRGBCYC 0xC3 10字节
+    {0xC3, (uint8_t[]){0x08,0x00,0x0A,0x10,0x08,0x54,0x45,0x71,0x2C}, 9, 0},
+
+    // SETRGBCYC(default) 0xC4 18字节
+    {0xC4, (uint8_t[]){
+        0x00,0xA0,0x79,0x0E,0x0A,0x16,0x79,0x0E,0x0A,0x16,
+        0x79,0x0E,0x0A,0x16,0x82,0x00,0x03
+    }, 17, 0},
+
+    // SET_GD(default) 0xD0 7字节
+    {0xD0, (uint8_t[]){0x04,0x0C,0x6A,0x0F,0x00,0x03}, 6, 0},
+
+    // RAMCTRL(default) 0xD7 3字节
+    {0xD7, (uint8_t[]){0x13, 0x00}, 2, 0},
+
+    // ---------------- PAGE2 0xDE 0x02 延时1ms ----------------
+    {0xDE, (uint8_t[]){0x02}, 1, 1},
+
+    // DCDC_SET 0xB8 6字节
+    {0xB8, (uint8_t[]){0x1F,0x8F,0x2F,0x2C,0x2B}, 5, 0},
+
+    // 0xB2 5字节 延时1ms
+    {0xB2, (uint8_t[]){0x30,0xFA,0x93,0x6E}, 4, 1},
+
+    // 0xC1 5字节
+    {0xC1, (uint8_t[]){0x10,0x66,0x66,0x01}, 4, 0},
+
+    // 0xC4 3字节
+    {0xC4, (uint8_t[]){0x7C, 0x03}, 2, 0},
+
+    // 重复PAGE2 0xDE 0x02 延时1ms
+    {0xDE, (uint8_t[]){0x02}, 1, 1},
+
+    // OSCM 0xC5 4字节 延时1ms
+    {0xC5, (uint8_t[]){0x4E, 0x00, 0x00}, 3, 1},
+
+    // SETMIPI_2 0xCA 4字节 延时1ms
+    {0xCA, (uint8_t[]){0x30, 0x20, 0xF4}, 3, 1},
+
+    // ---------------- PAGE4 0xDE 0x04 延时1ms ----------------
+    {0xDE, (uint8_t[]){0x04}, 1, 1},
+
+    // SETPHY3 0xD3 2字节 延时1ms
+    {0xD3, (uint8_t[]){0x3C}, 1, 1},
+
+    // 切回PAGE0 0xDE 0x00 延时1ms
+    {0xDE, (uint8_t[]){0x00}, 1, 1},
+
+
+  //  {0x11, (uint8_t[]){0x00}, 0, 120},
+
+ //   {0x29, (uint8_t[]){0x00}, 0, 0},
+
+    { 0x11, (uint8_t[]){0x00},0, 120}, // Sleep out, delay 120ms
+    // enable Command2
+  {0x29, (uint8_t[]){0x00},0, 0} // Display on, delay 20ms
+};
+
+static const uint8_t i2c_init_seq_default[][2] = {
+    {0x95, 0x11},
+    {0x95, 0x17},
+    {0x96, 0x00},
+    {0x96, 0xFF}};
+
+const DisplayConfig SCREEN_DEFAULT = {
+    .name = "7-DSI-TOUCH-A",
+    .hsync_pulse_width = 50,
+    .hsync_back_porch = 239,
+    .hsync_front_porch = 33,
+    .vsync_pulse_width = 30,
+    .vsync_back_porch = 20,
+    .vsync_front_porch = 2,
+    .prefer_speed = 20000000,
+    .lane_bit_rate = 1400,
+    .width = 240,
+    .height = 320,
+    .rotation = 0,
+    .auto_flush = true,
+    .rst_pin = -1,
+    .init_cmds = vendor_specific_init_default,
+    .init_cmds_size = sizeof(vendor_specific_init_default) / sizeof(lcd_init_cmd_t),
+    .i2c_address = 0x45,
+    .i2c_sda_pin = -1,
+    .i2c_scl_pin = -1,
+    .i2c_clock_speed = 100000,
+    .i2c_init_seq = i2c_init_seq_default,
+    .i2c_init_seq_size = sizeof(i2c_init_seq_default) / (2 * sizeof(uint8_t))};    
 #else
 #error "A valid screen size is not defined, please set the CURRENT_SCREEN macro"
 #endif
